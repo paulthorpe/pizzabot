@@ -42,9 +42,8 @@ var accessToken = "6a0a368df7ee4efa8ffa48a8d73c64bb";
 var baseUrl = "https://api.api.ai/v1/";
 		
 function send(text) {
-	//cant use cookies from local file system need http calls
-	//var session = checkCookie();
-	var session = 'notrandom1';
+	var session = checkCookie();
+	//var session = 'notrandom1';
 	
 	console.log(session);
 	$.ajax({
