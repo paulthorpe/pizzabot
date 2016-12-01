@@ -1,6 +1,6 @@
 module.exports = function (req, res, next) {
 	var apiai = require('apiai');
-	var accessToken = "<need key>";
+	var accessToken = "6a0a368df7ee4efa8ffa48a8d73c64bb";
 	var baseUrl = "https://api.api.ai/v1/";
 	var app = apiai(accessToken);
 	var question = req.body.text;
