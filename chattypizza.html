@@ -1,0 +1,190 @@
+<html>
+<head>
+<title>My Chatty Pizza</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script type="text/javascript" src="jquery-3.1.1.js"></script>
+<script type="text/javascript">
+
+function checkCookie() {
+    var cookieData=getCookie("chattoken");
+    if (cookieData=="") {
+		cookieData = 's' + new Date().getUTCMilliseconds();
+        setCookie("chattoken", cookieData, 2);
+    }
+
+	return cookieData;
+}
+
+function getCookie(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i = 0; i <ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0)==' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length,c.length);
+        }
+    }
+    return "";
+}
+
+function setCookie(cname, cvalue, exdays) {
+    var d = new Date();
+    d.setTime(d.getTime() + (exdays*24*60*60*1000));
+    var expires = "expires="+ d.toUTCString();
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
+var accessToken = "6a0a368df7ee4efa8ffa48a8d73c64bb";
+var baseUrl = "https://api.api.ai/v1/";
+		
+function send(text) {
+	//cant use cookies from local file system need http calls
+	//var session = checkCookie();
+	var session = 'notrandom1';
+	
+	console.log(session);
+	$.ajax({
+		type: "POST",
+		url: baseUrl + "query?v=20150910",
+		contentType: "application/json; charset=utf-8",
+		dataType: "json",
+		headers: {
+			"Authorization": "Bearer " + accessToken
+		},
+		data: JSON.stringify({ query: text, lang: "en", sessionId: session }),
+		success: function(data) {
+			setResponse(data.result.fulfillment.speech);
+			if(data.result.action != ""){
+				var action = data.result.action
+				var fn = window[action];
+				if(typeof fn === "function"){
+					var flavour = data.result.contexts[0].parameters.flavour;
+					fn.call(null,flavour);
+				}
+			}
+		},
+		error: function() {
+			setResponse("Internal Server Error");
+		}
+	});
+}
+
+var pizzaInOven = 0;
+
+function orderpizzatype(type){
+	pizzaInOven++;
+	$("#shopfront").append("<div id='oven_" + pizzaInOven + "'>making a " + type + " pizza</div>");
+	
+	if(type == "calzone")
+	{
+		
+	}
+	
+	setTimeout('pizzaMade',6000,pizzaInOven)
+}
+
+function pizzaMade(ovenRef)
+{
+	$("#oven" + ovenRef).append(" - Done");
+} 
+
+function setResponse(val) {
+	$("#fullchat").append("PizzaBot : " + val + "<br/>");
+}
+
+function sendTts(text) {
+	console.log("here");
+	$.get(baseUrl + "tts?v=20150910&text=" + text, function( data ) {
+		alert( "Load was performed." );
+	});
+}
+	
+$(document).ready(function() {
+	$(window).keydown(function(event){
+		if(event.keyCode == 13) {
+			event.preventDefault();
+			return false;
+		}
+	});
+	
+	$("#say").click(function() {
+		var userSay = $("#youchat").val();
+		$("#fullchat").append("You : " + userSay + "<br/>");
+		send(userSay);
+		$("#youchat").val("");
+	});
+	
+	$("#tts").click(function() {
+		var userTts = $("#youtts").val();
+		$("#fulltts").append("TTS : " + userTts + "<br/>");
+		sendTts(userTts);
+		$("#youtts").val("");
+	});
+});
+</script>
+</head>
+<body>
+<div class="container">
+	<div class="row">
+		<div class="col-sm-12">
+			<nav class="navbar navbar-default">
+				<div class="navbar-header">
+					
+				</div>
+			</nav>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-sm-5">
+			<h1>Chatty Pizza</h1>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-sm-5">
+			<form>
+				<input type="text" id="youchat" name="youchat" size="55">
+				<button id="say" name="say" type="button">say</button>
+			</form>
+		</div>
+		<div class="col-sm-2"></div>
+		<div class="col-sm-5">
+			<h4>Pizza makers task list</h4>
+			<div id="shopfront"></div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-sm-5">
+			<div id="fullchat"></div>
+		</div>
+		<div class="col-sm-7"></div>
+	</div>
+	<div class="row">
+		<div class="col-sm-12">
+			<hr/>
+		</div>
+	</div>
+	<!--<div class="row">
+		<div class="col-sm-12">
+			<h2>Text To Speech test</h2>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-sm-12">
+			<form>
+				<input type="text" id="youtts" name="youtts" size="55">
+				<button id="tts" name="tts" type="button">Convert and Listen</button>
+			</form>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-sm-12">
+			<div id="fulltts"></div>
+		</div>
+	</div>-->
+</div>
+</body>
+<html>
