@@ -12,6 +12,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // test route
 app.get('/test', function (req, res) { res.status(200).send('Hello world!') });
 
+app.use(express.static('public'))
+
 // main routes
 app.get('/',function(req,res){       
 	//__dirname : It will resolve to your project folder.
