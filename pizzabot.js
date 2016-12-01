@@ -7,6 +7,8 @@ module.exports = function (req, res, next) {
 	var app = apiai(accessToken);
 	var question = req.body.text;
 	
+	question = question.toLowerCase().replace("pizzabot", "").trim();
+	
 	console.log(req.body.token);
 	
 	if(req.body.token != undefined){
