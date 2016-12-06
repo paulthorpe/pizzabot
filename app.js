@@ -1,8 +1,8 @@
+"use strict";
 var express = require('express');
 var bodyParser = require('body-parser');
-var hellobot = require('./pizzabot');
 var path = require("path");
-
+var pb = require('./pizzabot');
 var app = express();
 var port = process.env.PORT || 3000;
 
@@ -20,7 +20,9 @@ app.get('/',function(req,res){
 	res.sendFile(path.join(__dirname+'/chattypizza.html'));
 });
 
-app.post('/hello', hellobot);
+app.post('/hello', function(req, res, next){
+	pb.PizzaBotChat(req, res, next);
+});
 
 // error handler
 app.use(function (err, req, res, next) {
@@ -28,6 +30,8 @@ app.use(function (err, req, res, next) {
   res.status(400).send(err.message);
 });
 
-app.listen(port, function () {
-  console.log('Slack bot listening on port ' + port);
+var server = app.listen(port, function () {
+  //console.log('Slack bot listening on port ' + port);
 });
+
+module.exports = server;
